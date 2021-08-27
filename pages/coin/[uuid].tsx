@@ -25,7 +25,7 @@ export default function CoinPage({ data }: CoinProps) {
         leftIcon={<ArrowBackIcon />}
         mb="5"
       >
-        Back
+        Voltar
       </Button>
       <Box d="flex" justifyContent="center" alignItems="center">
         <Box 

@@ -1,9 +1,9 @@
-import { Grid, Box, Heading, Image, Text, Button, Input } from '@chakra-ui/react';
+import { Grid, Box, Heading, Image, Text, Button, Input, FormControl, FormHelperText } from '@chakra-ui/react';
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 import api from '../services/api';
 
@@ -32,15 +32,17 @@ const Home: NextPage<HomeProps> = ({ coins }) => {
   }
 
   const handleSearchButton = () => {
-    console.log(foundCoin);
-    if(coinInput) {
-      const coin = coins.find(coin => coin.name === coinInput);
-      if(coin) {
-        setFoundCoin(coin);
-      }
-      setHasError(true);
+    const coin = coinInput && coins.find(coin => coin.name === coinInput);
+    if(coin) {
+      setFoundCoin(coin);
+      return;
     }
+    setHasError(true);
   }
+
+  useEffect(() => {
+    !coinInput && setFoundCoin({} as Coins);
+  }, [coinInput]);
 
   return (
     <>
@@ -48,17 +50,20 @@ const Home: NextPage<HomeProps> = ({ coins }) => {
         <title>Crypto Tracker</title>
       </Head>
       <Box d="flex" alignItems="center">
-        <Input 
-          isInvalid={hasError}
-          placeholder="Search for a coin"
-          w="250px"
-          color="white"
-          mr="5"
-          onChange={event => setCoinInput(event.target.value)}
-        />
-        <Button colorScheme="teal" onClick={handleSearchButton}>Search</Button>
+        <FormControl id="coin">
+          <Input 
+            isInvalid={hasError}
+            placeholder="Pesquise uma moeda"
+            w="250px"
+            color="white"
+            mr="5"
+            onChange={event => setCoinInput(event.target.value)}
+          />
+          {hasError && <FormHelperText>Moeda {coinInput} não encontrada</FormHelperText>}
+          <Button colorScheme="teal" onClick={handleSearchButton}>Pesquisar</Button>
+        </FormControl>
       </Box>
-      {Object.keys(foundCoin).length !== 0 ? (
+      {Object.keys(foundCoin).length !== 0 && coinInput ? (
         <Box 
           borderWidth="2px" 
           key={foundCoin.uuid} 
