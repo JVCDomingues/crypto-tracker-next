@@ -1,7 +1,9 @@
-import { Grid, Box, Heading, Image, Text, Button } from '@chakra-ui/react';
+import { Grid, Box, Heading, Image, Text, Button, Input } from '@chakra-ui/react';
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
+
+import { useState } from 'react';
 
 import api from '../services/api';
 
@@ -20,10 +22,24 @@ type Coins = {
 }
 
 const Home: NextPage<HomeProps> = ({ coins }) => {
+  const [coinInput, setCoinInput] = useState('');
+  const [hasError, setHasError] = useState(false);
+  const [foundCoin, setFoundCoin] = useState({} as Coins);
   const router = useRouter();
 
   const handleNavigation = (uuid: string) => {
     router.push(`/coin/${uuid}`);
+  }
+
+  const handleSearchButton = () => {
+    console.log(foundCoin);
+    if(coinInput) {
+      const coin = coins.find(coin => coin.name === coinInput);
+      if(coin) {
+        setFoundCoin(coin);
+      }
+      setHasError(true);
+    }
   }
 
   return (
@@ -31,7 +47,39 @@ const Home: NextPage<HomeProps> = ({ coins }) => {
       <Head>
         <title>Crypto Tracker</title>
       </Head>
-      <Grid p="4" templateColumns="repeat(3, 1fr)" gap="10" w="100%">
+      <Box d="flex" alignItems="center">
+        <Input 
+          isInvalid={hasError}
+          placeholder="Search for a coin"
+          w="250px"
+          color="white"
+          mr="5"
+          onChange={event => setCoinInput(event.target.value)}
+        />
+        <Button colorScheme="teal" onClick={handleSearchButton}>Search</Button>
+      </Box>
+      {Object.keys(foundCoin).length !== 0 ? (
+        <Box 
+          borderWidth="2px" 
+          key={foundCoin.uuid} 
+          borderRadius="md" 
+          p="4" 
+          w="350px"
+          borderColor={foundCoin.color}
+          boxShadow="0px 0px 2px 2px rgba(0,0,0,0.1)"
+          mt="5"
+        >
+          <Box d="flex" alignItems="center">
+            <Image src={foundCoin.iconUrl} size="sm" alt={foundCoin.name} boxSize="40px" />
+            <Heading size="md" color="#fff" ml="5">{foundCoin.name}</Heading>
+          </Box>
+
+          <Text mt="5" color="white" fontWeight="bold">$ {foundCoin.price}</Text>
+
+          <Button w="100%" mt="5" colorScheme="telegram" onClick={() => handleNavigation(foundCoin.uuid)}>Ver Detalhes</Button>
+        </Box>
+      ) : (
+      <Grid templateColumns="repeat(3, 1fr)" gap="10" w="100%" mt="5">
         {coins.map(coin => (
           <Box 
             borderWidth="2px" 
@@ -53,6 +101,7 @@ const Home: NextPage<HomeProps> = ({ coins }) => {
           </Box>
         ))}
       </Grid>
+      )}
     </>
   )
 }
