@@ -41,7 +41,10 @@ const Home: NextPage<HomeProps> = ({ coins }) => {
   }
 
   useEffect(() => {
-    !coinInput && setFoundCoin({} as Coins);
+    if(!coinInput) {
+      setFoundCoin({} as Coins);
+      setHasError(false);
+    }
   }, [coinInput]);
 
   return (
@@ -59,18 +62,17 @@ const Home: NextPage<HomeProps> = ({ coins }) => {
             mr="5"
             onChange={event => setCoinInput(event.target.value)}
           />
-          {hasError && <FormHelperText>Moeda {coinInput} não encontrada</FormHelperText>}
+          {hasError && <FormHelperText>Moeda não encontrada</FormHelperText>}
           <Button colorScheme="teal" onClick={handleSearchButton}>Pesquisar</Button>
         </FormControl>
       </Box>
       {Object.keys(foundCoin).length !== 0 && coinInput ? (
         <Box 
-          borderWidth="2px" 
+          bg="gray.700"
           key={foundCoin.uuid} 
           borderRadius="md" 
           p="4" 
           w="350px"
-          borderColor={foundCoin.color}
           boxShadow="0px 0px 2px 2px rgba(0,0,0,0.1)"
           mt="5"
         >
@@ -87,12 +89,11 @@ const Home: NextPage<HomeProps> = ({ coins }) => {
       <Grid templateColumns="repeat(3, 1fr)" gap="10" w="100%" mt="5">
         {coins.map(coin => (
           <Box 
-            borderWidth="2px" 
+            bg="gray.700"
             key={coin.uuid} 
             borderRadius="md" 
             p="4" 
             w="100%" 
-            borderColor={coin.color}
             boxShadow="0px 0px 2px 2px rgba(0,0,0,0.1)"
           >
             <Box d="flex" alignItems="center">
